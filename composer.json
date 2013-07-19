@@ -1,0 +1,14 @@
+{
+	"name"             : "MorganEstes/CoralCDN",
+	"description"      : "Coral CDN WordPress Plugin",
+	"minimum-stability": "stable",
+	"authors"          : [
+		{
+			"name" : "Morgan Estes",
+			"email": "morgan@golftailor.com.com"
+		}
+	],
+    "require": {
+        "ccampbell/chromephp": "4.1.0"
+    }
+}
