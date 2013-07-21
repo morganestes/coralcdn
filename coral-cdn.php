@@ -1,4 +1,5 @@
 <?php
+include_once 'vendor/autoload.php';
 /*
 Plugin Name: Coral CDN
 Plugin URI: http://morganestes.me/coral-cdn
@@ -17,12 +18,25 @@ License: GPLv3
 class Coral_CDN {
 
 	private static $instance;
-	public $cdn = 'nyud.net';
+	private $cdn = '.nyud.net';
 	public $file_types;
+	private $theme;
+	private $theme_type;
+	private $home_url;
+	private $cdn_url;
 
 	private function __construct() {
-		self::set_file_types( array( 'jpg', 'jpeg', 'gif', 'png', 'css', 'js' ) );
-
+		$this->set_file_types(
+			array(
+				'images' => array( 'jpg', 'jpeg', 'gif', 'png', ),
+				'text'   => array( 'css', 'js', ),
+			)
+		);
+		add_action( 'after_setup_theme', array( $this, 'set_theme_type' ) );
+		$this->theme    = wp_get_theme();
+		$this->home_url = get_home_url();
+		$this->set_cdn_url( $this->home_url . $this->cdn );
+		$this->filterize();
 	}
 
 	/**
@@ -51,10 +65,86 @@ class Coral_CDN {
 		$this->file_types = $file_types;
 	}
 
+	/**
+	 * @return mixed
+	 */
+	public function get_theme() {
+		return $this->theme->Name;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function get_theme_type() {
+		return $this->theme_type;
+	}
+
+	/**
+	 * @internal param mixed $theme_type
+	 */
+	public function set_theme_type() {
+		$theme_type = 'parent';
+
+		if ( is_child_theme() )
+			$theme_type = 'child';
+
+		$this->theme_type = $theme_type;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_cdn_url() {
+		return $this->cdn_url;
+	}
+
+	/**
+	 * @param string $cdn_url
+	 */
+	public function set_cdn_url( $cdn_url ) {
+		$this->cdn_url = $cdn_url;
+	}
+
+	/**
+	 * @param $content
+	 *
+	 * @return mixed
+	 */
+	function cdnize_content( $content ) {
+		$content = str_ireplace( 'src="' . $this->home_url, 'src="' . $this->cdn_url, $content );
+		$content = str_ireplace( "src='{$this->home_url}", "src='{$this->cdn_url}", $content );
+
+		return $content;
+	}
+
+	/**
+	 * @param $url
+	 *
+	 * @return mixed
+	 */
+	function cdnize_attachments( $url ) {
+		$url = str_ireplace( $this->home_url, $this->cdn_url, $url );
+		
+		return $url;
+	}
+
+	private function filterize() {
+		// String replacement for any images inside the authored content.
+		add_filter( 'the_content', array( $this, 'cdnize_content' ) );
+
+		// String replacement for uploaded images.
+		add_filter( 'wp_get_attachment_url', array( $this, 'cdnize_attachments' ) );
+
+		// Change the URL requested by bloginfo('url').
+		//add_filter( 'bloginfo_url', array( $this, 'get_cdn_url' ) );
+
+		// Change the URL throughout the site, e.g. links, meta, pages, etc.
+		//add_filter( 'option_home', array( $this, 'get_cdn_url' ) );
+	}
 }
 
 $coral = Coral_CDN::get_instance();
 
-include_once "vendor/autoload.php";
-ChromePhp::log( 'Hello console!' );
-ChromePhp::log( $coral->file_types );
+ChromePhp::log( get_bloginfo( 'url' ) );
+ChromePhp::info( get_home_url() );
+ChromePhp::info( $coral->get_cdn_url() );
