@@ -1,5 +1,4 @@
 <?php
-include_once 'vendor/autoload.php';
 /*
 Plugin Name: Coral CDN
 Plugin URI: http://morganestes.me/coral-cdn
@@ -19,21 +18,13 @@ class Coral_CDN {
 
 	private static $instance;
 	private $cdn = '.nyud.net';
-	public $file_types;
-	private $theme;
-	private $theme_type;
 	private $home_url;
 	private $cdn_url;
 
+	/**
+	 * Constructor to initialize the class and fire off events.
+	 */
 	private function __construct() {
-		$this->set_file_types(
-			array(
-				'images' => array( 'jpg', 'jpeg', 'gif', 'png', ),
-				'text'   => array( 'css', 'js', ),
-			)
-		);
-		add_action( 'after_setup_theme', array( $this, 'set_theme_type' ) );
-		$this->theme    = wp_get_theme();
 		$this->home_url = get_home_url();
 		$this->set_cdn_url( $this->home_url . $this->cdn );
 		$this->filterize();
@@ -49,46 +40,6 @@ class Coral_CDN {
 			self::$instance = new Coral_CDN();
 
 		return self::$instance;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function get_file_types() {
-		return $this->file_types;
-	}
-
-	/**
-	 * @param array $file_types
-	 */
-	public function set_file_types( $file_types ) {
-		$this->file_types = $file_types;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function get_theme() {
-		return $this->theme->Name;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function get_theme_type() {
-		return $this->theme_type;
-	}
-
-	/**
-	 * @internal param mixed $theme_type
-	 */
-	public function set_theme_type() {
-		$theme_type = 'parent';
-
-		if ( is_child_theme() )
-			$theme_type = 'child';
-
-		$this->theme_type = $theme_type;
 	}
 
 	/**
@@ -128,23 +79,13 @@ class Coral_CDN {
 		return $url;
 	}
 
-	private function filterize() {
+	function filterize() {
 		// String replacement for any images inside the authored content.
 		add_filter( 'the_content', array( $this, 'cdnize_content' ) );
 
 		// String replacement for uploaded images.
 		add_filter( 'wp_get_attachment_url', array( $this, 'cdnize_attachments' ) );
-
-		// Change the URL requested by bloginfo('url').
-		//add_filter( 'bloginfo_url', array( $this, 'get_cdn_url' ) );
-
-		// Change the URL throughout the site, e.g. links, meta, pages, etc.
-		//add_filter( 'option_home', array( $this, 'get_cdn_url' ) );
 	}
 }
 
 $coral = Coral_CDN::get_instance();
-
-ChromePhp::log( get_bloginfo( 'url' ) );
-ChromePhp::info( get_home_url() );
-ChromePhp::info( $coral->get_cdn_url() );
