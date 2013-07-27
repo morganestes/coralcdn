@@ -124,7 +124,7 @@ class Coral_CDN {
 	 */
 	function cdnize_attachments( $url ) {
 		$url = str_ireplace( $this->home_url, $this->cdn_url, $url );
-		
+
 		return $url;
 	}
 
