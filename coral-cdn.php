@@ -2,7 +2,7 @@
 include_once 'vendor/autoload.php';
 /*
 Plugin Name: Coral CDN
-Plugin URI: http://morganestes.me/coral-cdn
+Plugin URI: http://wordpress.org/plugins/coralcdn/
 Description: Use the free peer CDN from Coral to speed up your website.
 Version: 0.1.0
 Author: Morgan Estes
@@ -33,6 +33,7 @@ class Coral_CDN {
 			)
 		);
 		add_action( 'after_setup_theme', array( $this, 'set_theme_type' ) );
+		add_action( 'in_admin_footer', array( $this, 'admin_footer' ) );
 		$this->theme    = wp_get_theme();
 		$this->home_url = get_home_url();
 		$this->set_cdn_url( $this->home_url . $this->cdn );
@@ -140,6 +141,11 @@ class Coral_CDN {
 
 		// Change the URL throughout the site, e.g. links, meta, pages, etc.
 		//add_filter( 'option_home', array( $this, 'get_cdn_url' ) );
+	}
+
+	function admin_footer() {
+		$plugin_data = get_plugin_data( __FILE__ );
+		printf( 'This site is faster when using %1$s Plugin | Version %2$s by %3$s<br />', $plugin_data['Title'], $plugin_data['Version'], $plugin_data['Author'] );
 	}
 }
 

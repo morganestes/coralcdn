@@ -3,7 +3,7 @@ Contributors: morganestes
 Donate link: http://morganestes.me/donate/
 Tags: CDN, content delivery network, speed, performance
 Requires at least: 2.1.0
-Tested up to: 3.6-R2
+Tested up to: 3.6
 Stable tag: trunk
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -34,6 +34,10 @@ The plugin works by rewriting the site’s URL for any images you upload when ed
 Not yet, but I’m working on that next.
 
 == Changelog ==
+
+= 0.1.1 =
+* Verified compatibilty with 3.6.
+* Added message in the footer to promote the plugin.
 
 = 0.1.0 =
 * Initial release.
