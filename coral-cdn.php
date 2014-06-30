@@ -1,10 +1,9 @@
 <?php
-include_once 'vendor/autoload.php';
 /*
 Plugin Name: Coral CDN
-Plugin URI: http://wordpress.org/plugins/coralcdn/
+Plugin URI: http://morganestes.me/coral-cdn
 Description: Use the free peer CDN from Coral to speed up your website.
-Version: 0.1.0
+Version: 1.0.1
 Author: Morgan Estes
 Author URI: http://morganestes.me
 License: GPLv3
@@ -19,25 +18,20 @@ class Coral_CDN {
 
 	private static $instance;
 	private $cdn = '.nyud.net';
-	public $file_types;
-	private $theme;
-	private $theme_type;
 	private $home_url;
 	private $cdn_url;
 
+	/**
+	 * Constructor to initialize the class and fire off events.
+	 */
 	private function __construct() {
-		$this->set_file_types(
-			array(
-				'images' => array( 'jpg', 'jpeg', 'gif', 'png', ),
-				'text'   => array( 'css', 'js', ),
-			)
-		);
-		add_action( 'after_setup_theme', array( $this, 'set_theme_type' ) );
-		add_action( 'in_admin_footer', array( $this, 'admin_footer' ) );
-		$this->theme    = wp_get_theme();
 		$this->home_url = get_home_url();
 		$this->set_cdn_url( $this->home_url . $this->cdn );
 		$this->filterize();
+	}
+
+	protected function __clone() {
+		// do nothing
 	}
 
 	/**
@@ -46,53 +40,15 @@ class Coral_CDN {
 	 * @return Coral_CDN
 	 */
 	public static function get_instance() {
-		if ( ! self::$instance )
+		if ( !self::$instance )
 			self::$instance = new Coral_CDN();
 
 		return self::$instance;
 	}
 
 	/**
-	 * @return array
-	 */
-	public function get_file_types() {
-		return $this->file_types;
-	}
-
-	/**
-	 * @param array $file_types
-	 */
-	public function set_file_types( $file_types ) {
-		$this->file_types = $file_types;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function get_theme() {
-		return $this->theme->Name;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function get_theme_type() {
-		return $this->theme_type;
-	}
-
-	/**
-	 * @internal param mixed $theme_type
-	 */
-	public function set_theme_type() {
-		$theme_type = 'parent';
-
-		if ( is_child_theme() )
-			$theme_type = 'child';
-
-		$this->theme_type = $theme_type;
-	}
-
-	/**
+	 *
+	 *
 	 * @return string
 	 */
 	public function get_cdn_url() {
@@ -100,6 +56,8 @@ class Coral_CDN {
 	}
 
 	/**
+	 *
+	 *
 	 * @param string $cdn_url
 	 */
 	public function set_cdn_url( $cdn_url ) {
@@ -107,7 +65,9 @@ class Coral_CDN {
 	}
 
 	/**
-	 * @param $content
+	 *
+	 *
+	 * @param unknown $content
 	 *
 	 * @return mixed
 	 */
@@ -119,7 +79,9 @@ class Coral_CDN {
 	}
 
 	/**
-	 * @param $url
+	 *
+	 *
+	 * @param string $url
 	 *
 	 * @return mixed
 	 */
@@ -129,28 +91,43 @@ class Coral_CDN {
 		return $url;
 	}
 
-	private function filterize() {
+	/**
+	 * Filter {@link the_content()} for potential replacement on the fly.
+	 */
+	function filterize() {
 		// String replacement for any images inside the authored content.
 		add_filter( 'the_content', array( $this, 'cdnize_content' ) );
 
 		// String replacement for uploaded images.
 		add_filter( 'wp_get_attachment_url', array( $this, 'cdnize_attachments' ) );
-
-		// Change the URL requested by bloginfo('url').
-		//add_filter( 'bloginfo_url', array( $this, 'get_cdn_url' ) );
-
-		// Change the URL throughout the site, e.g. links, meta, pages, etc.
-		//add_filter( 'option_home', array( $this, 'get_cdn_url' ) );
 	}
 
-	function admin_footer() {
-		$plugin_data = get_plugin_data( __FILE__ );
-		printf( 'This site is faster when using %1$s Plugin | Version %2$s by %3$s<br />', $plugin_data['Title'], $plugin_data['Version'], $plugin_data['Author'] );
+	/**
+	 * Sets the value of instance.
+	 *
+	 * @param mixed $instance the instance
+	 */
+	public function set_instance( $instance ) {
+		$this->instance = $instance;
+	}
+
+	/**
+	 * Gets the value of home_url.
+	 *
+	 * @return mixed
+	 */
+	public function get_home_url() {
+		return $this->home_url;
+	}
+
+	/**
+	 * Sets the value of home_url.
+	 *
+	 * @param mixed $home_url the home_url
+	 */
+	public function set_home_url( $home_url ) {
+		$this->home_url = $home_url;
 	}
 }
 
 $coral = Coral_CDN::get_instance();
-
-ChromePhp::log( get_bloginfo( 'url' ) );
-ChromePhp::info( get_home_url() );
-ChromePhp::info( $coral->get_cdn_url() );

@@ -1,10 +1,10 @@
 === CoralCDN ===
 Contributors: morganestes
-Donate link: http://morganestes.me/donate/
+Donate link: http://www.morganestes.me/donate/
 Tags: CDN, content delivery network, speed, performance
 Requires at least: 2.1.0
-Tested up to: 3.6
-Stable tag: trunk
+Tested up to: 3.9
+Stable tag: 1.0.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -31,13 +31,16 @@ The plugin works by rewriting the site’s URL for any images you upload when ed
 
 = Can I use this for CSS/JS files? =
 
-Not yet, but I’m working on that next.
+Not yet, but I'm working on that.
 
 == Changelog ==
 
+= 1.0.0 =
+* Admin changes only. Code is same version as 0.1.1.
+* Switched to [semver](http://semver.org) version numbering.
+
 = 0.1.1 =
-* Verified compatibilty with 3.6.
-* Added message in the footer to promote the plugin.
+* Minor updates to make sure right URL is used.
 
 = 0.1.0 =
 * Initial release.
